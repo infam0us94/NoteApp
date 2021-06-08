@@ -157,10 +157,7 @@
             android:text="Pick Color"
             android:textAlignment="textEnd"
             android:textColor="@color/ColorWhite"
-            android:textSize="@dimen/_12ssp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etNoteTitle" />
+            android:textSize="@dimen/_12ssp"/>
 
     </LinearLayout>
 
@@ -171,10 +168,7 @@
         android:layout_margin="@dimen/_10sdp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -192,10 +186,7 @@
             android:maxLines="1"
             android:text="Add Image"
             android:textColor="@color/ColorWhite"
-            android:textSize="@dimen/_12ssp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etNoteTitle" />
+            android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
 
@@ -208,10 +199,7 @@
         android:layout_marginBottom="@dimen/_10sdp"
         android:background="@color/colorPrimary"
         android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -229,10 +217,7 @@
             android:maxLines="1"
             android:text="Add Web Link"
             android:textColor="@color/ColorWhite"
-            android:textSize="@dimen/_12ssp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etNoteTitle" />
+            android:textSize="@dimen/_12ssp" />
 
     </LinearLayout>
 
@@ -246,10 +231,7 @@
         android:background="@color/colorPrimary"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -267,10 +249,7 @@
             android:maxLines="1"
             android:text="Delete Note"
             android:textColor="@color/ColorWhite"
-            android:textSize="@dimen/_12ssp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etNoteTitle" />
+            android:textSize="@dimen/_12ssp"/>
 
     </LinearLayout>
 

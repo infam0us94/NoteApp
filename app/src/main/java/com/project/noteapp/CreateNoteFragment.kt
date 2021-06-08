@@ -56,7 +56,7 @@ class CreateNoteFragment : BaseFragment() {
             saveNote()
         }
         imgBack.setOnClickListener {
-            replaceFragment(HomeFragment.newInstance(), false)
+            replaceFragment(HomeFragment.newInstance())
         }
     }
 
@@ -88,7 +88,7 @@ class CreateNoteFragment : BaseFragment() {
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, isTransition: Boolean) {
+    private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = parentFragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.frame_layout, fragment)

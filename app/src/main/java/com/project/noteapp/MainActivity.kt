@@ -11,11 +11,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            replaceFragment(HomeFragment.newInstance(), false)
+            replaceFragment(HomeFragment.newInstance())
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, isTransition: Boolean) {
+    private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         fragmentTransaction.add(R.id.frame_layout, fragment)

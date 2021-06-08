@@ -39,11 +39,11 @@ class HomeFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         fabBtnCreateNote.setOnClickListener {
 
-           replaceFragment(CreateNoteFragment.newInstance(), true)
+           replaceFragment(CreateNoteFragment.newInstance())
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, isTransition: Boolean) {
+    private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = parentFragmentManager.beginTransaction()
 
         fragmentTransaction.replace(R.id.frame_layout, fragment)

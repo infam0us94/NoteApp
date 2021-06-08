@@ -5,8 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.fragment_home.*
 
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     private lateinit var root: View
 
@@ -24,7 +25,6 @@ class HomeFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,5 +33,21 @@ class HomeFragment : Fragment() {
         root = inflater.inflate(R.layout.fragment_home, container, false)
 
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fabBtnCreateNote.setOnClickListener {
+
+           replaceFragment(CreateNoteFragment.newInstance(), true)
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment, isTransition: Boolean) {
+        val fragmentTransaction = parentFragmentManager.beginTransaction()
+
+        fragmentTransaction.replace(R.id.frame_layout, fragment)
+            .addToBackStack(fragment.javaClass.simpleName)
+            .commit()
     }
 }

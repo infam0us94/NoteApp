@@ -72,7 +72,7 @@
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/fNote4"
+            android:id="@+id/fNote3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/_5sdp">
@@ -81,6 +81,25 @@
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
                 android:background="@drawable/note_color_4" />
+
+            <ImageView
+                android:id="@+id/imgNote3"
+                android:layout_width="@dimen/_16sdp"
+                android:layout_height="@dimen/_16sdp"
+                android:layout_gravity="center"
+                app:tint="@color/ColorWhite" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fNote4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/_5sdp">
+
+            <View
+                android:layout_width="@dimen/_24sdp"
+                android:layout_height="@dimen/_24sdp"
+                android:background="@drawable/note_color_5" />
 
             <ImageView
                 android:id="@+id/imgNote4"
@@ -99,7 +118,7 @@
             <View
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
-                android:background="@drawable/note_color_5" />
+                android:background="@drawable/note_color_6" />
 
             <ImageView
                 android:id="@+id/imgNote5"
@@ -118,29 +137,10 @@
             <View
                 android:layout_width="@dimen/_24sdp"
                 android:layout_height="@dimen/_24sdp"
-                android:background="@drawable/note_color_6" />
-
-            <ImageView
-                android:id="@+id/imgNote6"
-                android:layout_width="@dimen/_16sdp"
-                android:layout_height="@dimen/_16sdp"
-                android:layout_gravity="center"
-                app:tint="@color/ColorWhite" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/fNote7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="@dimen/_5sdp">
-
-            <View
-                android:layout_width="@dimen/_24sdp"
-                android:layout_height="@dimen/_24sdp"
                 android:background="@drawable/note_color_7" />
 
             <ImageView
-                android:id="@+id/imgNote7"
+                android:id="@+id/imgNote6"
                 android:layout_width="@dimen/_16sdp"
                 android:layout_height="@dimen/_16sdp"
                 android:layout_gravity="center"

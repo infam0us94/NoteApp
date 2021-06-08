@@ -1,6 +1,7 @@
 package com.project.noteapp.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.project.noteapp.R
 import com.project.noteapp.entities.Notes
+import kotlinx.android.synthetic.main.item_rv_notes.view.*
 
 class NotesAdapter(private val context: Context, private val list: List<Notes>) :
     RecyclerView.Adapter<NotesAdapter.ViewHolder>() {
@@ -32,6 +34,12 @@ class NotesAdapter(private val context: Context, private val list: List<Notes>) 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(list[position])
+
+        if (list[position].color != null) {
+            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(list[position].color))
+        } else {
+            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(R.color.colorLightBlack.toString()))
+        }
     }
 
     override fun getItemCount() = list.size

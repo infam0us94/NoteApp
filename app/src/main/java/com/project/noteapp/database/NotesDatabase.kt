@@ -1,6 +1,7 @@
 package com.project.noteapp.database
 
 import android.content.Context
+import android.provider.ContactsContract
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -15,7 +16,7 @@ abstract class NotesDatabase : RoomDatabase() {
 
         @Synchronized
         fun getDatabase(context: Context): NotesDatabase {
-            if (notesDatabase != null) {
+            if (notesDatabase == null) {
                 notesDatabase = Room.databaseBuilder(
                     context,
                     NotesDatabase::class.java,

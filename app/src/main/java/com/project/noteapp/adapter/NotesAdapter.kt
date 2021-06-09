@@ -1,6 +1,7 @@
 package com.project.noteapp.adapter
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -38,7 +39,14 @@ class NotesAdapter(private val context: Context, private val list: List<Notes>) 
         if (list[position].color != null) {
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(list[position].color))
         } else {
-            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(R.color.colorLightBlack.toString()))
+            holder.itemView.cardView.setCardBackgroundColor(Color.BLACK)
+        }
+
+        if(list[position].imgPath != null) {
+            holder.itemView.imgNote.setImageBitmap(BitmapFactory.decodeFile(list[position].imgPath))
+            holder.itemView.imgNote.visibility = View.VISIBLE
+        }else {
+            holder.itemView.imgNote.visibility = View.GONE
         }
     }
 

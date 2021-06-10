@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Html
 import android.util.Log
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +31,12 @@ import com.project.noteapp.database.NotesDatabase
 import com.project.noteapp.entities.Notes
 import com.project.noteapp.util.NoteBottomSheetFragment
 import kotlinx.android.synthetic.main.fragment_create_note.*
+import kotlinx.android.synthetic.main.fragment_create_note.imgNote
+import kotlinx.android.synthetic.main.fragment_create_note.tvWebLink
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.item_rv_notes.*
 import kotlinx.android.synthetic.main.item_rv_notes.tvDateTime
+import kotlinx.android.synthetic.main.item_rv_notes.view.*
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -45,8 +51,9 @@ class CreateNoteFragment : BaseFragment() {
     private lateinit var root: View
     private lateinit var currentDate: String
     private var REQUEST_CODE_IMAGE = 456
-    private var READ_STORAGE_PERM = 123
     private var selectedImagePath = ""
+    private var webLink = ""
+    private var noteId = -1
     var selectedColor = "#171C26"
 
     companion object {
@@ -61,6 +68,7 @@ class CreateNoteFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        noteId = requireArguments().getInt("noteId", -1)
     }
 
 
@@ -77,6 +85,40 @@ class CreateNoteFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (noteId != -1) {
+            launch {
+                context?.let {
+                    val notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+                    colorView.setBackgroundColor(Color.parseColor(notes.color))
+                    etNoteTitle.setText(notes.title)
+                    etNoteSubTitle.setText(notes.subTitle)
+                    etNoteDesc.setText(notes.noteText)
+                    if (notes.imgPath != ""){
+                        selectedImagePath = notes.imgPath!!
+                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgPath))
+                        layoutImage.visibility = View.VISIBLE
+                        imgNote.visibility = View.VISIBLE
+                        imgDelete.visibility = View.VISIBLE
+                    }else{
+                        layoutImage.visibility = View.GONE
+                        imgNote.visibility = View.GONE
+                        imgDelete.visibility = View.GONE
+                    }
+
+                    if (notes.webLink != ""){
+                        webLink = notes.webLink!!
+                        tvWebLink.text = notes.webLink
+                        layoutWebUrl.visibility = View.VISIBLE
+                        etWebLink.setText(notes.webLink)
+                        imgUrlDelete.visibility = View.VISIBLE
+                    }else{
+                        imgUrlDelete.visibility = View.GONE
+                        layoutWebUrl.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
             BroadcastReceiver, IntentFilter("bottom_sheet_action")
         )
@@ -88,7 +130,11 @@ class CreateNoteFragment : BaseFragment() {
         tvDateTime.text = currentDate
 
         imgDone.setOnClickListener {
-            saveNote()
+            if (noteId != -1){
+                updateNote()
+            }else{
+                saveNote()
+            }
         }
 
         imgBack.setOnClickListener {
@@ -96,11 +142,72 @@ class CreateNoteFragment : BaseFragment() {
         }
 
         imgMore.setOnClickListener {
-            val noteBottomSheet = NoteBottomSheetFragment.newInstance()
+            var noteBottomSheet = NoteBottomSheetFragment.newInstance(noteId)
             noteBottomSheet.show(
                 requireActivity().supportFragmentManager,
                 "Note Bottom Sheet Fragment"
             )
+        }
+
+        imgDelete.setOnClickListener {
+            selectedImagePath = ""
+            layoutImage.visibility = View.GONE
+
+        }
+
+        btnOk.setOnClickListener {
+            if (etWebLink.text.toString().trim().isNotEmpty()) {
+                checkWebUrl()
+            } else {
+                Toast.makeText(requireContext(), "Web is Required", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            if (noteId != -1){
+                tvWebLink.visibility = View.VISIBLE
+                layoutWebUrl.visibility = View.GONE
+            }else{
+                layoutWebUrl.visibility = View.GONE
+            }
+        }
+
+        imgUrlDelete.setOnClickListener {
+            webLink = ""
+            tvWebLink.visibility = View.GONE
+            imgUrlDelete.visibility = View.GONE
+            layoutWebUrl.visibility = View.GONE
+        }
+
+        tvWebLink.setOnClickListener {
+            var intent = Intent(Intent.ACTION_PICK, Uri.parse(etWebLink.text.toString()))
+            startActivity(intent)
+        }
+    }
+
+    private fun updateNote(){
+        launch {
+
+            context?.let {
+                var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+
+                notes.title = etNoteTitle.text.toString()
+                notes.subTitle = etNoteSubTitle.text.toString()
+                notes.noteText = etNoteDesc.text.toString()
+                notes.dateTime = currentDate
+                notes.color = selectedColor
+                notes.imgPath = selectedImagePath
+                notes.webLink = webLink
+
+                NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
+                etNoteTitle.setText("")
+                etNoteSubTitle.setText("")
+                etNoteDesc.setText("")
+                layoutImage.visibility = View.GONE
+                imgNote.visibility = View.GONE
+                tvWebLink.visibility = View.GONE
+                requireActivity().supportFragmentManager.popBackStack()
+            }
         }
     }
 
@@ -109,12 +216,13 @@ class CreateNoteFragment : BaseFragment() {
         if (etNoteTitle.text.isNullOrEmpty()) {
             Toast.makeText(context, "Note title is Required", Toast.LENGTH_SHORT).show()
         }
-        if (etNoteSubTitle.text.isNullOrEmpty()) {
+       else if (etNoteSubTitle.text.isNullOrEmpty()) {
             Toast.makeText(context, "Note Sub Title is Required", Toast.LENGTH_SHORT).show()
         }
-        if (etNoteDesc.text.isNullOrEmpty()) {
+        else if (etNoteDesc.text.isNullOrEmpty()) {
             Toast.makeText(context, "Note Description is Required", Toast.LENGTH_SHORT).show()
         } else {
+
             launch {
                 val notes = Notes()
                 notes.title = etNoteTitle.text.toString()
@@ -123,25 +231,41 @@ class CreateNoteFragment : BaseFragment() {
                 notes.color = selectedColor
                 notes.dateTime = currentDate
                 notes.imgPath = selectedImagePath
+                notes.webLink = webLink
 
                 context?.let {
                     NotesDatabase.getDatabase(it).noteDao().insertNotes(notes)
                     etNoteTitle.setText("")
                     etNoteSubTitle.setText("")
                     etNoteDesc.setText("")
+                    layoutImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
+                    tvWebLink.visibility = View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
         }
     }
 
-    private fun replaceFragment(fragment: Fragment) {
-        val fragmentTransaction = parentFragmentManager.beginTransaction()
+    private fun checkWebUrl() {
+        if (Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()) {
+            layoutWebUrl.visibility = View.GONE
+            etWebLink.isEnabled = false
+            webLink = etWebLink.text.toString()
+            tvWebLink.visibility = View.VISIBLE
+            tvWebLink.text = etWebLink.text.toString()
+        } else {
+            Toast.makeText(requireContext(), "Url is not valid ", Toast.LENGTH_SHORT).show()
+        }
+    }
 
-        fragmentTransaction.replace(R.id.frame_layout, fragment)
-            .addToBackStack(fragment.javaClass.simpleName)
-            .commit()
+    private fun deleteNote(){
+        launch {
+            context?.let {
+                NotesDatabase.getDatabase(it).noteDao().deleteSpecificNote(noteId)
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
     }
 
     private val BroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -189,9 +313,21 @@ class CreateNoteFragment : BaseFragment() {
 
                 "Image" -> {
                     readStorageTask()
+                    layoutWebUrl.visibility = View.GONE
+                }
+
+                "WebUrl" -> {
+                    layoutWebUrl.visibility = View.VISIBLE
+                }
+
+                "DeleteNote" -> {
+                    deleteNote()
                 }
 
                 else -> {
+                    layoutImage.visibility = View.GONE
+                    imgNote.visibility = View.GONE
+                    layoutWebUrl.visibility = View.GONE
                     selectedColor = p1.getStringExtra("selectedColor")!!
                     colorView.setBackgroundColor(Color.parseColor(selectedColor))
                 }
@@ -247,7 +383,7 @@ class CreateNoteFragment : BaseFragment() {
                         selectedImagePath = getPathFromUri(selectedImageUrl)!!
                     } catch (e: Exception) {
                         Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
-                        Log.w(TAG,e.message.toString())
+                        Log.w(TAG, e.message.toString())
                     }
                 }
             }

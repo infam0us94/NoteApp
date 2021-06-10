@@ -22,4 +22,12 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(fragment.javaClass.simpleName)
             .commit()
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val fragments = supportFragmentManager.fragments
+        if (fragments.size == 0){
+            finish()
+        }
+    }
 }

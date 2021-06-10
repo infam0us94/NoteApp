@@ -12,8 +12,16 @@ import com.project.noteapp.R
 import com.project.noteapp.entities.Notes
 import kotlinx.android.synthetic.main.item_rv_notes.view.*
 
-class NotesAdapter(private val context: Context, private val list: List<Notes>) :
+class NotesAdapter() :
     RecyclerView.Adapter<NotesAdapter.ViewHolder>() {
+
+     var listener: OnItemClickListener? = null
+      var list = ArrayList<Notes>()
+
+    fun setData(list: List<Notes>) {
+        this.list = list as ArrayList<Notes>
+        notifyDataSetChanged()
+    }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.tvTitle)
@@ -29,26 +37,45 @@ class NotesAdapter(private val context: Context, private val list: List<Notes>) 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
-            LayoutInflater.from(context).inflate(R.layout.item_rv_notes, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.item_rv_notes, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(list[position])
 
-        if (list[position].color != null) {
+        if (list[position].color != null){
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(list[position].color))
-        } else {
-            holder.itemView.cardView.setCardBackgroundColor(Color.BLACK)
+        }else{
+            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(R.color.colorLightBlack.toString()))
         }
 
-        if(list[position].imgPath != null) {
+        if (list[position].imgPath != null){
             holder.itemView.imgNote.setImageBitmap(BitmapFactory.decodeFile(list[position].imgPath))
             holder.itemView.imgNote.visibility = View.VISIBLE
-        }else {
+        }else{
             holder.itemView.imgNote.visibility = View.GONE
+        }
+
+        if (list[position].webLink != ""){
+            holder.itemView.tvWebLink.text = list[position].webLink
+            holder.itemView.tvWebLink.visibility = View.VISIBLE
+        }else{
+            holder.itemView.tvWebLink.visibility = View.GONE
+        }
+
+        holder.itemView.cardView.setOnClickListener {
+            listener!!.onClicked(list[position].id!!)
         }
     }
 
     override fun getItemCount() = list.size
+
+    fun setOnClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
+
+    interface OnItemClickListener{
+        fun onClicked(noteId: Int)
+    }
 }

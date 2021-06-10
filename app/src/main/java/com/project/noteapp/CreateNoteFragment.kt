@@ -48,38 +48,32 @@ class CreateNoteFragment : BaseFragment() {
 
     private val TAG = "CreateNoteFragment"
 
-    private lateinit var root: View
-    private lateinit var currentDate: String
+    var selectedColor = "#171C26"
+    var currentDate: String? = null
     private var REQUEST_CODE_IMAGE = 456
     private var selectedImagePath = ""
     private var webLink = ""
     private var noteId = -1
-    var selectedColor = "#171C26"
-
-    companion object {
-
-        fun newInstance(): CreateNoteFragment {
-            val fragment = CreateNoteFragment()
-            val bundle = Bundle()
-
-            return fragment
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         noteId = requireArguments().getInt("noteId", -1)
     }
 
-
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        root = inflater.inflate(R.layout.fragment_create_note, container, false)
+    ): View? {
+        return inflater.inflate(R.layout.fragment_create_note, container, false)
+    }
 
-        return root
+    companion object {
+        @JvmStatic
+        fun newInstance() =
+            CreateNoteFragment().apply {
+                arguments = Bundle().apply {
+                }
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -88,51 +82,51 @@ class CreateNoteFragment : BaseFragment() {
         if (noteId != -1) {
             launch {
                 context?.let {
-                    val notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
+                    var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
                     colorView.setBackgroundColor(Color.parseColor(notes.color))
                     etNoteTitle.setText(notes.title)
                     etNoteSubTitle.setText(notes.subTitle)
                     etNoteDesc.setText(notes.noteText)
-                    if (notes.imgPath != ""){
+                    if (notes.imgPath != "") {
                         selectedImagePath = notes.imgPath!!
                         imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgPath))
                         layoutImage.visibility = View.VISIBLE
                         imgNote.visibility = View.VISIBLE
                         imgDelete.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         layoutImage.visibility = View.GONE
                         imgNote.visibility = View.GONE
                         imgDelete.visibility = View.GONE
                     }
 
-                    if (notes.webLink != ""){
+                    if (notes.webLink != "") {
                         webLink = notes.webLink!!
                         tvWebLink.text = notes.webLink
                         layoutWebUrl.visibility = View.VISIBLE
                         etWebLink.setText(notes.webLink)
                         imgUrlDelete.visibility = View.VISIBLE
-                    }else{
+                    } else {
                         imgUrlDelete.visibility = View.GONE
                         layoutWebUrl.visibility = View.GONE
                     }
                 }
             }
         }
-
         LocalBroadcastManager.getInstance(requireContext()).registerReceiver(
             BroadcastReceiver, IntentFilter("bottom_sheet_action")
         )
 
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+
         currentDate = sdf.format(Date())
         colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
         tvDateTime.text = currentDate
 
         imgDone.setOnClickListener {
-            if (noteId != -1){
+            if (noteId != -1) {
                 updateNote()
-            }else{
+            } else {
                 saveNote()
             }
         }
@@ -142,8 +136,8 @@ class CreateNoteFragment : BaseFragment() {
         }
 
         imgMore.setOnClickListener {
-            var noteBottomSheet = NoteBottomSheetFragment.newInstance(noteId)
-            noteBottomSheet.show(
+            var noteBottomSheetFragment = NoteBottomSheetFragment.newInstance(noteId)
+            noteBottomSheetFragment.show(
                 requireActivity().supportFragmentManager,
                 "Note Bottom Sheet Fragment"
             )
@@ -152,22 +146,21 @@ class CreateNoteFragment : BaseFragment() {
         imgDelete.setOnClickListener {
             selectedImagePath = ""
             layoutImage.visibility = View.GONE
-
         }
 
         btnOk.setOnClickListener {
             if (etWebLink.text.toString().trim().isNotEmpty()) {
                 checkWebUrl()
             } else {
-                Toast.makeText(requireContext(), "Web is Required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Url is Required", Toast.LENGTH_SHORT).show()
             }
         }
 
         btnCancel.setOnClickListener {
-            if (noteId != -1){
+            if (noteId != -1) {
                 tvWebLink.visibility = View.VISIBLE
                 layoutWebUrl.visibility = View.GONE
-            }else{
+            } else {
                 layoutWebUrl.visibility = View.GONE
             }
         }
@@ -180,12 +173,13 @@ class CreateNoteFragment : BaseFragment() {
         }
 
         tvWebLink.setOnClickListener {
-            var intent = Intent(Intent.ACTION_PICK, Uri.parse(etWebLink.text.toString()))
+            var intent = Intent(Intent.ACTION_VIEW, Uri.parse(etWebLink.text.toString()))
             startActivity(intent)
         }
     }
 
-    private fun updateNote(){
+
+    private fun updateNote() {
         launch {
 
             context?.let {
@@ -214,25 +208,23 @@ class CreateNoteFragment : BaseFragment() {
     private fun saveNote() {
 
         if (etNoteTitle.text.isNullOrEmpty()) {
-            Toast.makeText(context, "Note title is Required", Toast.LENGTH_SHORT).show()
-        }
-       else if (etNoteSubTitle.text.isNullOrEmpty()) {
+            Toast.makeText(context, "Note Title is Required", Toast.LENGTH_SHORT).show()
+        } else if (etNoteSubTitle.text.isNullOrEmpty()) {
+
             Toast.makeText(context, "Note Sub Title is Required", Toast.LENGTH_SHORT).show()
-        }
-        else if (etNoteDesc.text.isNullOrEmpty()) {
+        } else if (etNoteDesc.text.isNullOrEmpty()) {
+
             Toast.makeText(context, "Note Description is Required", Toast.LENGTH_SHORT).show()
         } else {
-
             launch {
-                val notes = Notes()
+                var notes = Notes()
                 notes.title = etNoteTitle.text.toString()
                 notes.subTitle = etNoteSubTitle.text.toString()
                 notes.noteText = etNoteDesc.text.toString()
-                notes.color = selectedColor
                 notes.dateTime = currentDate
+                notes.color = selectedColor
                 notes.imgPath = selectedImagePath
                 notes.webLink = webLink
-
                 context?.let {
                     NotesDatabase.getDatabase(it).noteDao().insertNotes(notes)
                     etNoteTitle.setText("")
@@ -247,6 +239,15 @@ class CreateNoteFragment : BaseFragment() {
         }
     }
 
+    private fun deleteNote() {
+        launch {
+            context?.let {
+                NotesDatabase.getDatabase(it).noteDao().deleteSpecificNote(noteId)
+                requireActivity().supportFragmentManager.popBackStack()
+            }
+        }
+    }
+
     private fun checkWebUrl() {
         if (Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()) {
             layoutWebUrl.visibility = View.GONE
@@ -255,18 +256,10 @@ class CreateNoteFragment : BaseFragment() {
             tvWebLink.visibility = View.VISIBLE
             tvWebLink.text = etWebLink.text.toString()
         } else {
-            Toast.makeText(requireContext(), "Url is not valid ", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Url is not valid", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun deleteNote(){
-        launch {
-            context?.let {
-                NotesDatabase.getDatabase(it).noteDao().deleteSpecificNote(noteId)
-                requireActivity().supportFragmentManager.popBackStack()
-            }
-        }
-    }
 
     private val BroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
@@ -287,11 +280,13 @@ class CreateNoteFragment : BaseFragment() {
 
                 }
 
+
                 "Purple" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
                     colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
                 }
+
 
                 "Green" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
@@ -302,13 +297,11 @@ class CreateNoteFragment : BaseFragment() {
                 "Orange" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
                     colorView.setBackgroundColor(Color.parseColor(selectedColor))
-
                 }
 
                 "Black" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
                     colorView.setBackgroundColor(Color.parseColor(selectedColor))
-
                 }
 
                 "Image" -> {
@@ -323,7 +316,6 @@ class CreateNoteFragment : BaseFragment() {
                 "DeleteNote" -> {
                     deleteNote()
                 }
-
                 else -> {
                     layoutImage.visibility = View.GONE
                     imgNote.visibility = View.GONE
@@ -335,20 +327,16 @@ class CreateNoteFragment : BaseFragment() {
         }
     }
 
+    override fun onDestroy() {
+        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(BroadcastReceiver)
+        super.onDestroy()
+    }
+
     private fun readStorageTask() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             askForPermission()
         } else {
             openImageChooser()
-        }
-    }
-
-    private fun openImageChooser() {
-        Intent(Intent.ACTION_GET_CONTENT).also {
-            it.type = "image/*"
-            it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            it.addCategory(Intent.CATEGORY_OPENABLE)
-            startActivityForResult(it, REQUEST_CODE_IMAGE)
         }
     }
 
@@ -364,6 +352,15 @@ class CreateNoteFragment : BaseFragment() {
             cursor.close()
         }
         return filePath
+    }
+
+    private fun openImageChooser() {
+        Intent(Intent.ACTION_GET_CONTENT).also {
+            it.type = "image/*"
+            it.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            it.addCategory(Intent.CATEGORY_OPENABLE)
+            startActivityForResult(it, REQUEST_CODE_IMAGE)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -439,10 +436,5 @@ class CreateNoteFragment : BaseFragment() {
         } else {
             openImageChooser()
         }
-    }
-
-    override fun onDestroy() {
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(BroadcastReceiver)
-        super.onDestroy()
     }
 }

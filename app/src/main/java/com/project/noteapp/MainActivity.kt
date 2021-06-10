@@ -9,7 +9,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         if (savedInstanceState == null) {
             replaceFragment(HomeFragment.newInstance())
         }
@@ -17,7 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun replaceFragment(fragment: Fragment) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
-
         fragmentTransaction.add(R.id.frame_layout, fragment)
             .addToBackStack(fragment.javaClass.simpleName)
             .commit()
@@ -26,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         val fragments = supportFragmentManager.fragments
-        if (fragments.size == 0){
+        if (fragments.size == 0) {
             finish()
         }
     }

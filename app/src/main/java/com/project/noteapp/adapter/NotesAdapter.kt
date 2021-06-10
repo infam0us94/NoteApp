@@ -1,81 +1,73 @@
 package com.project.noteapp.adapter
 
-import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.project.noteapp.R
 import com.project.noteapp.entities.Notes
 import kotlinx.android.synthetic.main.item_rv_notes.view.*
 
 class NotesAdapter() :
-    RecyclerView.Adapter<NotesAdapter.ViewHolder>() {
-
-     var listener: OnItemClickListener? = null
-      var list = ArrayList<Notes>()
-
-    fun setData(list: List<Notes>) {
-        this.list = list as ArrayList<Notes>
-        notifyDataSetChanged()
-    }
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.findViewById(R.id.tvTitle)
-        val desc: TextView = itemView.findViewById(R.id.tvDesc)
-        val date: TextView = itemView.findViewById(R.id.tvDateTime)
-
-        fun bind(data: Notes) {
-            title.text = data.title.toString()
-            desc.text = data.noteText.toString()
-            date.text = data.dateTime.toString()
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =
+    RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
+    var listener: OnItemClickListener? = null
+    var arrList = ArrayList<Notes>()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotesViewHolder {
+        return NotesViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.item_rv_notes, parent, false)
-        return ViewHolder(view)
+        )
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(list[position])
+    override fun getItemCount(): Int {
+        return arrList.size
+    }
 
-        if (list[position].color != null){
-            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(list[position].color))
-        }else{
+    fun setData(arrNotesList: List<Notes>) {
+        arrList = arrNotesList as ArrayList<Notes>
+    }
+
+    fun setOnClickListener(listener1: OnItemClickListener) {
+        listener = listener1
+    }
+
+    override fun onBindViewHolder(holder: NotesViewHolder, position: Int) {
+
+        holder.itemView.tvTitle.text = arrList[position].title
+        holder.itemView.tvDesc.text = arrList[position].noteText
+        holder.itemView.tvDateTime.text = arrList[position].dateTime
+
+        if (arrList[position].color != null) {
+            holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(arrList[position].color))
+        } else {
             holder.itemView.cardView.setCardBackgroundColor(Color.parseColor(R.color.colorLightBlack.toString()))
         }
 
-        if (list[position].imgPath != null){
-            holder.itemView.imgNote.setImageBitmap(BitmapFactory.decodeFile(list[position].imgPath))
+        if (arrList[position].imgPath != null) {
+            holder.itemView.imgNote.setImageBitmap(BitmapFactory.decodeFile(arrList[position].imgPath))
             holder.itemView.imgNote.visibility = View.VISIBLE
-        }else{
+        } else {
             holder.itemView.imgNote.visibility = View.GONE
         }
 
-        if (list[position].webLink != ""){
-            holder.itemView.tvWebLink.text = list[position].webLink
+        if (arrList[position].webLink != "") {
+            holder.itemView.tvWebLink.text = arrList[position].webLink
             holder.itemView.tvWebLink.visibility = View.VISIBLE
-        }else{
+        } else {
             holder.itemView.tvWebLink.visibility = View.GONE
         }
 
         holder.itemView.cardView.setOnClickListener {
-            listener!!.onClicked(list[position].id!!)
+            listener!!.onClicked(arrList[position].id!!)
         }
+
     }
 
-    override fun getItemCount() = list.size
+    class NotesViewHolder(view: View) : RecyclerView.ViewHolder(view) {}
 
-    fun setOnClickListener(listener: OnItemClickListener) {
-        this.listener = listener
-    }
-
-    interface OnItemClickListener{
+    interface OnItemClickListener {
         fun onClicked(noteId: Int)
     }
+
 }

@@ -10,7 +10,7 @@ import com.project.noteapp.R
 import com.project.noteapp.entities.Notes
 import kotlinx.android.synthetic.main.item_rv_notes.view.*
 
-class NotesAdapter() :
+class NotesAdapter:
     RecyclerView.Adapter<NotesAdapter.NotesViewHolder>() {
     var listener: OnItemClickListener? = null
     var arrList = ArrayList<Notes>()

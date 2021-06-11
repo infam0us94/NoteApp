@@ -1,9 +1,12 @@
 package com.project.noteapp
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -12,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.project.noteapp.adapter.NotesAdapter
 import com.project.noteapp.database.NotesDatabase
+import com.project.noteapp.databinding.FragmentHomeBinding
 import com.project.noteapp.entities.Notes
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.coroutines.launch
@@ -20,8 +24,12 @@ import kotlin.collections.ArrayList
 
 class HomeFragment : BaseFragment() {
 
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
     var arrNotes = ArrayList<Notes>()
     var notesAdapter: NotesAdapter = NotesAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -31,8 +39,10 @@ class HomeFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding =  FragmentHomeBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     companion object {
@@ -47,8 +57,8 @@ class HomeFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recycler_view.setHasFixedSize(true)
-        recycler_view.layoutManager =
+       binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.layoutManager =
             StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         launch {
@@ -56,17 +66,17 @@ class HomeFragment : BaseFragment() {
                 var notes = NotesDatabase.getDatabase(it).noteDao().getAllNotes()
                 notesAdapter.setData(notes)
                 arrNotes = notes as ArrayList<Notes>
-                recycler_view.adapter = notesAdapter
+                binding.recyclerView.adapter = notesAdapter
             }
         }
 
         notesAdapter.setOnClickListener(onClicked)
 
-        fabBtnCreateNote.setOnClickListener {
+        binding.fabBtnCreateNote.setOnClickListener {
             replaceFragment(CreateNoteFragment.newInstance(), false)
         }
 
-        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 return true
             }
@@ -106,5 +116,10 @@ class HomeFragment : BaseFragment() {
         }
         fragmentTransition.replace(R.id.frame_layout, fragment)
             .addToBackStack(fragment.javaClass.simpleName).commit()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

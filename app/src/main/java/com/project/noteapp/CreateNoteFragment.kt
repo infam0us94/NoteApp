@@ -28,6 +28,8 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 import com.project.noteapp.database.NotesDatabase
+import com.project.noteapp.databinding.FragmentCreateNoteBinding
+import com.project.noteapp.databinding.FragmentHomeBinding
 import com.project.noteapp.entities.Notes
 import com.project.noteapp.util.NoteBottomSheetFragment
 import kotlinx.android.synthetic.main.fragment_create_note.*
@@ -48,6 +50,9 @@ class CreateNoteFragment : BaseFragment() {
 
     private val TAG = "CreateNoteFragment"
 
+    private var _binding: FragmentCreateNoteBinding? = null
+    private val binding get() = _binding!!
+
     var selectedColor = "#171C26"
     var currentDate: String? = null
     private var REQUEST_CODE_IMAGE = 456
@@ -63,8 +68,10 @@ class CreateNoteFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_create_note, container, false)
+    ): View {
+        _binding =  FragmentCreateNoteBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     companion object {
@@ -83,31 +90,31 @@ class CreateNoteFragment : BaseFragment() {
             launch {
                 context?.let {
                     var notes = NotesDatabase.getDatabase(it).noteDao().getSpecificNote(noteId)
-                    colorView.setBackgroundColor(Color.parseColor(notes.color))
-                    etNoteTitle.setText(notes.title)
-                    etNoteSubTitle.setText(notes.subTitle)
-                    etNoteDesc.setText(notes.noteText)
+                    binding.colorView.setBackgroundColor(Color.parseColor(notes.color))
+                    binding.etNoteTitle.setText(notes.title)
+                    binding.etNoteSubTitle.setText(notes.subTitle)
+                    binding.etNoteDesc.setText(notes.noteText)
                     if (notes.imgPath != "") {
                         selectedImagePath = notes.imgPath!!
-                        imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgPath))
-                        layoutImage.visibility = View.VISIBLE
-                        imgNote.visibility = View.VISIBLE
-                        imgDelete.visibility = View.VISIBLE
+                        binding.imgNote.setImageBitmap(BitmapFactory.decodeFile(notes.imgPath))
+                        binding.layoutImage.visibility = View.VISIBLE
+                        binding.imgNote.visibility = View.VISIBLE
+                        binding.imgDelete.visibility = View.VISIBLE
                     } else {
-                        layoutImage.visibility = View.GONE
-                        imgNote.visibility = View.GONE
-                        imgDelete.visibility = View.GONE
+                        binding.layoutImage.visibility = View.GONE
+                        binding.imgNote.visibility = View.GONE
+                        binding.imgDelete.visibility = View.GONE
                     }
 
                     if (notes.webLink != "") {
                         webLink = notes.webLink!!
-                        tvWebLink.text = notes.webLink
-                        layoutWebUrl.visibility = View.VISIBLE
-                        etWebLink.setText(notes.webLink)
-                        imgUrlDelete.visibility = View.VISIBLE
+                        binding.tvWebLink.text = notes.webLink
+                        binding.layoutWebUrl.visibility = View.VISIBLE
+                        binding.etWebLink.setText(notes.webLink)
+                        binding.imgUrlDelete.visibility = View.VISIBLE
                     } else {
-                        imgUrlDelete.visibility = View.GONE
-                        layoutWebUrl.visibility = View.GONE
+                        binding.imgUrlDelete.visibility = View.GONE
+                        binding.layoutWebUrl.visibility = View.GONE
                     }
                 }
             }
@@ -119,11 +126,11 @@ class CreateNoteFragment : BaseFragment() {
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
 
         currentDate = sdf.format(Date())
-        colorView.setBackgroundColor(Color.parseColor(selectedColor))
+        binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
-        tvDateTime.text = currentDate
+        binding.tvDateTime.text = currentDate
 
-        imgDone.setOnClickListener {
+        binding.imgDone.setOnClickListener {
             if (noteId != -1) {
                 updateNote()
             } else {
@@ -131,11 +138,11 @@ class CreateNoteFragment : BaseFragment() {
             }
         }
 
-        imgBack.setOnClickListener {
+        binding.imgBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
         }
 
-        imgMore.setOnClickListener {
+        binding.imgMore.setOnClickListener {
             var noteBottomSheetFragment = NoteBottomSheetFragment.newInstance(noteId)
             noteBottomSheetFragment.show(
                 requireActivity().supportFragmentManager,
@@ -143,12 +150,12 @@ class CreateNoteFragment : BaseFragment() {
             )
         }
 
-        imgDelete.setOnClickListener {
+        binding.imgDelete.setOnClickListener {
             selectedImagePath = ""
             layoutImage.visibility = View.GONE
         }
 
-        btnOk.setOnClickListener {
+        binding.btnOk.setOnClickListener {
             if (etWebLink.text.toString().trim().isNotEmpty()) {
                 checkWebUrl()
             } else {
@@ -156,7 +163,7 @@ class CreateNoteFragment : BaseFragment() {
             }
         }
 
-        btnCancel.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             if (noteId != -1) {
                 tvWebLink.visibility = View.VISIBLE
                 layoutWebUrl.visibility = View.GONE
@@ -165,14 +172,14 @@ class CreateNoteFragment : BaseFragment() {
             }
         }
 
-        imgUrlDelete.setOnClickListener {
+        binding.imgUrlDelete.setOnClickListener {
             webLink = ""
             tvWebLink.visibility = View.GONE
             imgUrlDelete.visibility = View.GONE
             layoutWebUrl.visibility = View.GONE
         }
 
-        tvWebLink.setOnClickListener {
+        binding.tvWebLink.setOnClickListener {
             var intent = Intent(Intent.ACTION_VIEW, Uri.parse(etWebLink.text.toString()))
             startActivity(intent)
         }
@@ -437,4 +444,10 @@ class CreateNoteFragment : BaseFragment() {
             openImageChooser()
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }

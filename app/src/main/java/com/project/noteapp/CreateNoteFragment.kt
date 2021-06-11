@@ -1,7 +1,6 @@
 package com.project.noteapp
 
 import android.Manifest
-import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,7 +12,6 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.text.Html
 import android.util.Log
 import android.util.Patterns
@@ -21,30 +19,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 import com.project.noteapp.database.NotesDatabase
 import com.project.noteapp.databinding.FragmentCreateNoteBinding
-import com.project.noteapp.databinding.FragmentHomeBinding
 import com.project.noteapp.entities.Notes
 import com.project.noteapp.util.NoteBottomSheetFragment
 import kotlinx.android.synthetic.main.fragment_create_note.*
-import kotlinx.android.synthetic.main.fragment_create_note.imgNote
-import kotlinx.android.synthetic.main.fragment_create_note.tvWebLink
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.item_rv_notes.*
-import kotlinx.android.synthetic.main.item_rv_notes.tvDateTime
-import kotlinx.android.synthetic.main.item_rv_notes.view.*
 import kotlinx.coroutines.launch
-import pub.devrel.easypermissions.AppSettingsDialog
-import pub.devrel.easypermissions.EasyPermissions
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.log
 
 class CreateNoteFragment : BaseFragment() {
 
@@ -201,12 +187,12 @@ class CreateNoteFragment : BaseFragment() {
                 notes.webLink = webLink
 
                 NotesDatabase.getDatabase(it).noteDao().updateNote(notes)
-                etNoteTitle.setText("")
-                etNoteSubTitle.setText("")
-                etNoteDesc.setText("")
-                layoutImage.visibility = View.GONE
-                imgNote.visibility = View.GONE
-                tvWebLink.visibility = View.GONE
+                binding.etNoteTitle.setText("")
+                binding.etNoteSubTitle.setText("")
+                binding.etNoteDesc.setText("")
+                binding.layoutImage.visibility = View.GONE
+                binding.imgNote.visibility = View.GONE
+                binding.tvWebLink.visibility = View.GONE
                 requireActivity().supportFragmentManager.popBackStack()
             }
         }
@@ -214,12 +200,12 @@ class CreateNoteFragment : BaseFragment() {
 
     private fun saveNote() {
 
-        if (etNoteTitle.text.isNullOrEmpty()) {
+        if (binding.etNoteTitle.text.isNullOrEmpty()) {
             Toast.makeText(context, "Note Title is Required", Toast.LENGTH_SHORT).show()
-        } else if (etNoteSubTitle.text.isNullOrEmpty()) {
+        } else if (binding.etNoteSubTitle.text.isNullOrEmpty()) {
 
             Toast.makeText(context, "Note Sub Title is Required", Toast.LENGTH_SHORT).show()
-        } else if (etNoteDesc.text.isNullOrEmpty()) {
+        } else if (binding.etNoteDesc.text.isNullOrEmpty()) {
 
             Toast.makeText(context, "Note Description is Required", Toast.LENGTH_SHORT).show()
         } else {
@@ -234,12 +220,12 @@ class CreateNoteFragment : BaseFragment() {
                 notes.webLink = webLink
                 context?.let {
                     NotesDatabase.getDatabase(it).noteDao().insertNotes(notes)
-                    etNoteTitle.setText("")
-                    etNoteSubTitle.setText("")
-                    etNoteDesc.setText("")
-                    layoutImage.visibility = View.GONE
-                    imgNote.visibility = View.GONE
-                    tvWebLink.visibility = View.GONE
+                    binding.etNoteTitle.setText("")
+                    binding.etNoteSubTitle.setText("")
+                    binding.etNoteDesc.setText("")
+                    binding.layoutImage.visibility = View.GONE
+                    binding.imgNote.visibility = View.GONE
+                    binding.tvWebLink.visibility = View.GONE
                     requireActivity().supportFragmentManager.popBackStack()
                 }
             }
@@ -257,11 +243,11 @@ class CreateNoteFragment : BaseFragment() {
 
     private fun checkWebUrl() {
         if (Patterns.WEB_URL.matcher(etWebLink.text.toString()).matches()) {
-            layoutWebUrl.visibility = View.GONE
-            etWebLink.isEnabled = false
+            binding.layoutWebUrl.visibility = View.GONE
+            binding.etWebLink.isEnabled = false
             webLink = etWebLink.text.toString()
-            tvWebLink.visibility = View.VISIBLE
-            tvWebLink.text = etWebLink.text.toString()
+            binding.tvWebLink.visibility = View.VISIBLE
+            binding.tvWebLink.text = etWebLink.text.toString()
         } else {
             Toast.makeText(requireContext(), "Url is not valid", Toast.LENGTH_SHORT).show()
         }
@@ -277,58 +263,58 @@ class CreateNoteFragment : BaseFragment() {
 
                 "Blue" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
                 }
 
                 "Yellow" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
                 }
 
 
                 "Purple" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
                 }
 
 
                 "Green" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
 
                 }
 
                 "Orange" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
                 }
 
                 "Black" -> {
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
                 }
 
                 "Image" -> {
                     readStorageTask()
-                    layoutWebUrl.visibility = View.GONE
+                    binding.layoutWebUrl.visibility = View.GONE
                 }
 
                 "WebUrl" -> {
-                    layoutWebUrl.visibility = View.VISIBLE
+                    binding.layoutWebUrl.visibility = View.VISIBLE
                 }
 
                 "DeleteNote" -> {
                     deleteNote()
                 }
                 else -> {
-                    layoutImage.visibility = View.GONE
-                    imgNote.visibility = View.GONE
-                    layoutWebUrl.visibility = View.GONE
+                    binding.layoutImage.visibility = View.GONE
+                    binding.imgNote.visibility = View.GONE
+                    binding.layoutWebUrl.visibility = View.GONE
                     selectedColor = p1.getStringExtra("selectedColor")!!
-                    colorView.setBackgroundColor(Color.parseColor(selectedColor))
+                    binding.colorView.setBackgroundColor(Color.parseColor(selectedColor))
                 }
             }
         }
@@ -380,9 +366,9 @@ class CreateNoteFragment : BaseFragment() {
                         var inputStream =
                             requireActivity().contentResolver.openInputStream(selectedImageUrl)
                         var bitmap = BitmapFactory.decodeStream(inputStream)
-                        imgNote.setImageBitmap(bitmap)
-                        imgNote.visibility = View.VISIBLE
-                        layoutImage.visibility = View.VISIBLE
+                        binding.imgNote.setImageBitmap(bitmap)
+                        binding.imgNote.visibility = View.VISIBLE
+                        binding.layoutImage.visibility = View.VISIBLE
 
                         selectedImagePath = getPathFromUri(selectedImageUrl)!!
                     } catch (e: Exception) {
@@ -449,5 +435,4 @@ class CreateNoteFragment : BaseFragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
